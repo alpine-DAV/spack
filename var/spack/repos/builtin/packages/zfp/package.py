@@ -85,24 +85,25 @@ class Zfp(CMakePackage, CudaPackage):
     def cmake_args(self):
         spec = self.spec
 
-        # CMake options
         args = [
-            # TODO: self.define_from_variant('BUILD_UTILITIES', 'utilities'),
-            self.define('BUILD_TESTING', self.run_tests),
-            self.define_from_variant('BUILD_SHARED_LIBS', 'shared'),
-            self.define_from_variant('BUILD_CFP', 'c'),
-            self.define_from_variant('BUILD_ZFPY', 'python'),
-            self.define_from_variant('BUILD_ZFORP', 'fortran'),
-            self.define_from_variant('ZFP_WITH_OPENMP', 'openmp'),
-            self.define_from_variant('ZFP_WITH_CUDA', 'cuda'),
-            self.define('ZFP_BIT_STREAM_WORD_SIZE',
-                        spec.variants['bsws'].value),
-            self.define_from_variant('ZFP_WITH_BIT_STREAM_STRIDED', 'strided'),
-            self.define_from_variant('ZFP_WITH_ALIGNED_ALLOC', 'aligned'),
-            self.define_from_variant('ZFP_WITH_CACHE_TWOWAY', 'twoway'),
-            self.define_from_variant('ZFP_WITH_CACHE_FAST_HASH', 'fasthash'),
-            self.define_from_variant('ZFP_WITH_CACHE_PROFILE', 'profile'),
+            '-DZFP_BIT_STREAM_WORD_SIZE:STRING={0}'.format(
+                spec.variants['bsws'].value),
+            '-DZFP_WITH_BIT_STREAM_STRIDED:BOOL={0}'.format(
+                'ON' if '+strided' in spec else 'OFF'),
+            '-DZFP_WITH_ALIGNED_ALLOC:BOOL={0}'.format(
+                'ON' if '+aligned' in spec else 'OFF'),
+            '-DZFP_WITH_CACHE_TWOWAY:BOOL={0}'.format(
+                'ON' if '+twoway' in spec else 'OFF'),
+            '-DBUILD_SHARED_LIBS:BOOL={0}'.format(
+                'ON' if '+shared' in spec else 'OFF'),
+            '-DBUILD_TESTING:BOOL={0}'.format(
+                'ON' if self.run_tests else 'OFF')
         ]
+        if spec.version >= Version('0.5.2'):
+            args.append('-DZFP_WITH_CACHE_FAST_HASH:BOOL={0}'.format(
+                'ON' if '+fasthash' in spec else 'OFF'))
+            args.append('-DZFP_WITH_CACHE_PROFILE:BOOL={0}'.format(
+                'ON' if '+profile' in spec else 'OFF'))
 
         if '+cuda' in spec:
             args.append('-DCUDA_BIN_DIR={0}'.format(spec['cuda'].prefix.bin))
