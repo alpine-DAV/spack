@@ -37,11 +37,11 @@ class Conduit(CMakePackage):
     url      = "https://github.com/LLNL/conduit/releases/download/v0.3.0/conduit-v0.3.0-src-with-blt.tar.gz"
     git      = "https://github.com/LLNL/conduit.git"
 
-    version('develop', branch='develop', submodules=True)
+    version('develop', branch='develop', submodules=True, preferred = True)
     # note: the main branch in conduit was renamed to develop, this next entry
     # is to bridge any spack dependencies that are still using the name master
     version('master', branch='develop', submodules=True)
-    # note: 2021-05-05 latest tagged release is now preferred instead of develop
+    
     version('0.7.2', sha256='359fd176297700cdaed2c63e3b72d236ff3feec21a655c7c8292033d21d5228a')
     version('0.7.1', sha256='460a480cf08fedbf5b38f707f94f20828798327adadb077f80dbab048fd0a07d')
     version('0.7.0', sha256='ecaa9668ebec5d4efad19b104d654a587c0adbd5f502128f89601408cb4d7d0c')
