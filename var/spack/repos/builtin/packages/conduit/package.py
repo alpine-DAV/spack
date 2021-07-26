@@ -150,6 +150,7 @@ class Conduit(CMakePackage):
     # Parmetis
     #######################
     depends_on("parmetis", when="+parmetis")
+    depends_on("metis", when="+parmetis")
 
     #######################
     # MPI
@@ -557,6 +558,7 @@ class Conduit(CMakePackage):
         cfg.write("# parmetis from spack \n")
 
         if "+parmetis" in spec:
+            cfg.write(cmake_cache_entry("METIS_DIR", spec['metis'].prefix))
             cfg.write(cmake_cache_entry("PARMETIS_DIR", spec['parmetis'].prefix))
         else:
             cfg.write("# parmetis not built by spack \n")
