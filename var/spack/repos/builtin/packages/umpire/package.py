@@ -19,6 +19,7 @@ class Umpire(CMakePackage, CudaPackage, ROCmPackage):
 
     version('develop', branch='develop', submodules=True)
     version('main', branch='main', submodules=True)
+    version('6.0.0', tag='v6.0.0', submodules=True)
     version('5.0.1', tag='v5.0.1', submodules=True)
     version('5.0.0', tag='v5.0.0', submodules=True)
     version('4.1.2', tag='v4.1.2', submodules=True)
@@ -46,6 +47,7 @@ class Umpire(CMakePackage, CudaPackage, ROCmPackage):
     version('0.1.4', tag='v0.1.4', submodules=True)
     version('0.1.3', tag='v0.1.3', submodules=True)
 
+    patch('cuda_symbols_fix.patch', when='@6.0.0')
     patch('camp_target_umpire_3.0.0.patch', when='@3.0.0')
     patch('cmake_version_check.patch', when='@4.1')
     patch('missing_header_for_numeric_limits.patch', when='@4.1:5.0.1')
@@ -64,7 +66,8 @@ class Umpire(CMakePackage, CudaPackage, ROCmPackage):
     depends_on('cmake@3.8:', type='build')
     depends_on('cmake@3.9:', when='+cuda', type='build')
 
-    depends_on('blt@0.4.0:', type='build', when='@4.1.3:')
+    depends_on('blt@0.4.1:', type='build', when='@6.0.0:')
+    depends_on('blt@0.4.0:', type='build', when='@4.1.3:5.0.1')
     depends_on('blt@:0.3.6', type='build', when='@:4.1.2')
 
     # variants +rocm and amdgpu_targets are not automatically passed to
@@ -74,7 +77,7 @@ class Umpire(CMakePackage, CudaPackage, ROCmPackage):
         depends_on('camp amdgpu_target=%s' % val, when='amdgpu_target=%s' % val)
 
     depends_on('camp')
-    depends_on('camp@master', when='@develop')
+    depends_on('camp@0.2.2', when='@6.0.0:')
     depends_on('camp+cuda', when='+cuda')
     for sm_ in CudaPackage.cuda_arch_values:
         depends_on('camp cuda_arch={0}'.format(sm_),
