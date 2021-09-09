@@ -79,10 +79,15 @@ class Dray(Package, CudaPackage):
     depends_on("raja~cuda~openmp~shared", when="~cuda~openmp~shared")
     depends_on("raja~cuda+openmp~shared", when="~cuda+openmp~shared")
 
-    depends_on("umpire+cuda+shared", when="+cuda+shared")
-    depends_on("umpire+cuda~shared", when="+cuda~shared")
-    depends_on("umpire~cuda+shared", when="~cuda+shared")
-    depends_on("umpire~cuda~shared", when="~cuda~shared")
+    depends_on("umpire+cuda~openmp+shared", when="+cuda~openmp+shared")
+    depends_on("umpire+cuda+openmp+shared", when="+cuda+openmp+shared")
+    depends_on("umpire+cuda~openmp~shared", when="+cuda~openmp~shared")
+    depends_on("umpire+cuda+openmp~shared", when="+cuda+openmp~shared")
+
+    depends_on("umpire~cuda~openmp+shared", when="~cuda~openmp+shared")
+    depends_on("umpire~cuda+openmp+shared", when="~cuda+openmp+shared")
+    depends_on("umpire~cuda~openmp~shared", when="~cuda~openmp~shared")
+    depends_on("umpire~cuda+openmp~shared", when="~cuda+openmp~shared")
 
     depends_on("mfem+shared+conduit~threadsafe", when="+shared")
     depends_on("mfem~shared+conduit~threadsafe", when="~shared")
