@@ -43,6 +43,8 @@ class Apcomp(Package):
     variant('openmp', default=True, description='Build with openmp support')
     variant('mpi', default=True, description='Build with MPI support')
     variant('shared', default=True, description='Build Shared Library')
+    # set to false for systems that implicitly link mpi
+    variant('blt_find_mpi', default=True, description='Use BLT CMake Find MPI logic')
 
     depends_on('cmake@3.9:', type='build')
     depends_on("mpi", when="+mpi")
@@ -66,6 +68,11 @@ class Apcomp(Package):
                 for arg in std_cmake_args:
                     if arg.count("RPATH") == 0:
                         cmake_args.append(arg)
+            if "+blt_find_mpi" in spec:
+                cmake_args.append("-DENABLE_FIND_MPI=ON")
+            else:
+                cmake_args.append("-DENABLE_FIND_MPI=OFF")
+
             cmake_args.extend(["-C", host_cfg_fname, "../src"])
             print("Configuring APComp...")
             cmake(*cmake_args)
