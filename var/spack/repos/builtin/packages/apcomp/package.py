@@ -68,11 +68,6 @@ class Apcomp(Package):
                 for arg in std_cmake_args:
                     if arg.count("RPATH") == 0:
                         cmake_args.append(arg)
-            if "+blt_find_mpi" in spec:
-                cmake_args.append("-DENABLE_FIND_MPI=ON")
-            else:
-                cmake_args.append("-DENABLE_FIND_MPI=OFF")
-
             cmake_args.extend(["-C", host_cfg_fname, "../src"])
             print("Configuring APComp...")
             cmake(*cmake_args)
@@ -158,7 +153,6 @@ class Apcomp(Package):
         if "+mpi" in spec:
             mpicc_path = spec['mpi'].mpicc
             mpicxx_path = spec['mpi'].mpicxx
-            mpifc_path = spec['mpi'].mpifc
             # if we are using compiler wrappers on cray systems
             # use those for mpi wrappers, b/c  spec['mpi'].mpicxx
             # etc make return the spack compiler wrappers
@@ -166,11 +160,13 @@ class Apcomp(Package):
             if cpp_compiler == "CC":
                 mpicc_path = "cc"
                 mpicxx_path = "CC"
-                mpifc_path = "ftn"
             cfg.write(cmake_cache_entry("ENABLE_MPI", "ON"))
             cfg.write(cmake_cache_entry("MPI_C_COMPILER", mpicc_path))
             cfg.write(cmake_cache_entry("MPI_CXX_COMPILER", mpicxx_path))
-            cfg.write(cmake_cache_entry("MPI_Fortran_COMPILER", mpifc_path))
+            if "+blt_find_mpi" in spec:
+                cfg.write(cmake_cache_entry("ENABLE_FIND_MPI", "ON"))
+            else:
+                cfg.write(cmake_cache_entry("ENABLE_FIND_MPI", "OFF"))
             mpiexe_bin = join_path(spec['mpi'].prefix.bin, 'mpiexec')
             if os.path.isfile(mpiexe_bin):
                 # starting with cmake 3.10, FindMPI expects MPIEXEC_EXECUTABLE

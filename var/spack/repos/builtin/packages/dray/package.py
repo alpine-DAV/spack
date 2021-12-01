@@ -51,6 +51,8 @@ class Dray(Package, CudaPackage):
     variant("logging", default=False, description='Enable logging')
     variant("stats", default=False, description='Enable stats')
     variant("mpi", default=True, description='Enable MPI compiler')
+    # set to false for systems that implicitly link mpi
+    variant('blt_find_mpi', default=True, description='Use BLT CMake Find MPI logic')
 
     depends_on('cuda', when='+cuda')
     depends_on('mpi', when='+mpi')
@@ -196,7 +198,6 @@ class Dray(Package, CudaPackage):
         if "+mpi" in spec:
             mpicc_path = spec['mpi'].mpicc
             mpicxx_path = spec['mpi'].mpicxx
-            mpifc_path = spec['mpi'].mpifc
             # if we are using compiler wrappers on cray systems
             # use those for mpi wrappers, b/c  spec['mpi'].mpicxx
             # etc make return the spack compiler wrappers
@@ -204,14 +205,13 @@ class Dray(Package, CudaPackage):
             if spec['mpi'].mpicc == spack_cc:
                 mpicc_path = c_compiler
                 mpicxx_path = cpp_compiler
-                mpifc_path = f_compiler
             cfg.write(cmake_cache_entry("ENABLE_MPI", "ON"))
             cfg.write(cmake_cache_entry("MPI_C_COMPILER", mpicc_path))
             cfg.write(cmake_cache_entry("MPI_CXX_COMPILER", mpicxx_path))
-            if "+fortran" in spec:
-                cfg.write(cmake_cache_entry("MPI_Fortran_COMPILER",
-                                            mpifc_path))
-
+            if "+blt_find_mpi" in spec:
+                cfg.write(cmake_cache_entry("ENABLE_FIND_MPI", "ON"))
+            else:
+                cfg.write(cmake_cache_entry("ENABLE_FIND_MPI", "OFF"))
             mpiexe_bin = join_path(spec['mpi'].prefix.bin, 'mpiexec')
             if os.path.isfile(mpiexe_bin):
                 # starting with cmake 3.10, FindMPI expects MPIEXEC_EXECUTABLE
